@@ -45,10 +45,24 @@ def plot_illumination(data, wavelength):
     plt.legend(['D65', 'Fluorescent'])
     plt.show()
 
+def plot_chromaticity(data, wavelength):
+    xchrom = data['x'][0,:] / (data['x'][0,:] + data['y'][0,:] +
+                               data['z'][0,:] )
+    ychrom = data['y'][0,:] / (data['x'][0,:] + data['y'][0,:] +
+                               data['z'][0,:] )
+    plt.clf()
+    plt.title("Pure Spectral Source Chromaticity")
+    #plt.xlabel("Wavelength [nm]")
+    plt.plot(xchrom, ychrom)
+
+    plt.legend(['x', 'y'])
+    plt.show()
+
+
 # Load data.npy
 data = np.load('.\CIE_data\data.npy', allow_pickle=True)[()]
 # List keys of dataset
-print(data.keys())
+#print(data.keys())
 wavelength = create_wavelength()
 #plot_wavelength(data, wavelength)
 
@@ -64,9 +78,6 @@ cie_1931[2,:] = data['z'][0,:]
 
 lms = np.matmul(A_inv,cie_1931)
 #plot_lms(lms, wavelength)
-plot_illumination(data, wavelength)
-
-#plt.plot(X[0,:], X[1,:],'.')
-#plt.axis('equal')
-#plt.title(title)
-#plt.show()
+#plot_illumination(data, wavelength)
+# Scection 3
+plot_chromaticity(data, wavelength)
