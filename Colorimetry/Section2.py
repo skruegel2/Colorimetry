@@ -35,10 +35,20 @@ def plot_lms(lms, wavelength):
     plt.legend(['l', 'm', 's'])
     plt.show()
 
+def plot_illumination(data, wavelength):
+    plt.clf
+    plt.title("Illumination")
+    plt.xlabel("Wavelength [nm]")
+    plt.ylabel("Value")
+    plt.plot(wavelength[0,:],data['illum1'][0,:])
+    plt.plot(wavelength[0,:],data['illum2'][0,:])
+    plt.legend(['D65', 'Fluorescent'])
+    plt.show()
+
 # Load data.npy
 data = np.load('.\CIE_data\data.npy', allow_pickle=True)[()]
 # List keys of dataset
-data.keys()
+print(data.keys())
 wavelength = create_wavelength()
 #plot_wavelength(data, wavelength)
 
@@ -53,7 +63,8 @@ cie_1931[1,:] = data['y'][0,:]
 cie_1931[2,:] = data['z'][0,:]
 
 lms = np.matmul(A_inv,cie_1931)
-plot_lms(lms, wavelength)
+#plot_lms(lms, wavelength)
+plot_illumination(data, wavelength)
 
 #plt.plot(X[0,:], X[1,:],'.')
 #plt.axis('equal')
