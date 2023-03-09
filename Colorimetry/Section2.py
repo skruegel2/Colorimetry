@@ -102,7 +102,7 @@ cie_1931[2,:] = data['z'][0,:]
 lms = np.matmul(A_inv,cie_1931)
 #plot_lms(lms, wavelength)
 #plot_illumination(data, wavelength)
-# Scection 3
+# Section 3
 R_CIE_1931 = [0.73467, 0.26533, 0.0]
 G_CIE_1931 = [0.27376, 0.71741, 0.00883]
 B_CIE_1931 = [0.16658, 0.00886, 0.82456]
@@ -112,5 +112,6 @@ G_709 = [0.300, 0.600, 0.100]
 B_709 = [0.150, 0.060, 0.790]
 D65 = [0.3127, 0.3290, 0.3583]
 EE = [0.3333, 0.3333, 0.3333]
-plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
-                  D65, EE)
+#plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
+#                  D65, EE)
+# Section 4
