@@ -45,17 +45,38 @@ def plot_illumination(data, wavelength):
     plt.legend(['D65', 'Fluorescent'])
     plt.show()
 
-def plot_chromaticity(data, wavelength):
+def plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
+                      D65, EE):
     xchrom = data['x'][0,:] / (data['x'][0,:] + data['y'][0,:] +
                                data['z'][0,:] )
     ychrom = data['y'][0,:] / (data['x'][0,:] + data['y'][0,:] +
                                data['z'][0,:] )
     plt.clf()
+    plt.style.use('default')
     plt.title("Pure Spectral Source Chromaticity")
     #plt.xlabel("Wavelength [nm]")
     plt.plot(xchrom, ychrom)
-
-    plt.legend(['x', 'y'])
+    # CIE
+    x_cie = [R_CIE_1931[0],G_CIE_1931[0],B_CIE_1931[0],R_CIE_1931[0]]
+    y_cie  = [R_CIE_1931[1],G_CIE_1931[1],B_CIE_1931[1],R_CIE_1931[1]]
+    x_709 = [R_709[0], G_709[0], B_709[0], R_709[0]]
+    y_709 = [R_709[1], G_709[1], B_709[1], R_709[1]]
+    x_D65 = [D65[0]]
+    y_D65 = [D65[1]]
+    x_EE = [EE[0]]
+    y_EE = [EE[1]]
+    plt.plot(x_cie, y_cie,'y')
+    plt.text(R_CIE_1931[0],R_CIE_1931[1],'R CIE')
+    plt.text(G_CIE_1931[0],G_CIE_1931[1],'G CIE')
+    plt.text(B_CIE_1931[0],B_CIE_1931[1],'B CIE')
+    plt.plot(x_709, y_709,'g')
+    plt.text(R_709[0],R_709[1],'R 709')
+    plt.text(G_709[0],G_709[1],'G 709')
+    plt.text(B_709[0],B_709[1],'B 709')
+    plt.plot(x_D65, y_D65, 'co')
+    plt.text(D65[0]-0.13,D65[1]-0.02,'D65 White')
+    plt.plot(x_EE, y_EE, 'mo')
+    plt.text(EE[0]+0.025, EE[1],'Equal Energy White')
     plt.show()
 
 
@@ -76,8 +97,20 @@ cie_1931[0,:] = data['x'][0,:]
 cie_1931[1,:] = data['y'][0,:]
 cie_1931[2,:] = data['z'][0,:]
 
+
+
 lms = np.matmul(A_inv,cie_1931)
 #plot_lms(lms, wavelength)
 #plot_illumination(data, wavelength)
 # Scection 3
-plot_chromaticity(data, wavelength)
+R_CIE_1931 = [0.73467, 0.26533, 0.0]
+G_CIE_1931 = [0.27376, 0.71741, 0.00883]
+B_CIE_1931 = [0.16658, 0.00886, 0.82456]
+
+R_709 = [0.640, 0.330, 0.030]
+G_709 = [0.300, 0.600, 0.100]
+B_709 = [0.150, 0.060, 0.790]
+D65 = [0.3127, 0.3290, 0.3583]
+EE = [0.3333, 0.3333, 0.3333]
+plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
+                  D65, EE)
