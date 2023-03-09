@@ -8,9 +8,6 @@ def create_wavelength():
     wavelength = np.zeros((1, 31))
     for idx in range(31):
         wavelength[0][idx] = 400 + 10 * idx
-    #wavelength = [400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510,
-    #              520, 520, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630,
-    #              640, 650, 660, 670, 680, 690, 700]
     return wavelength
 
 def plot_wavelength(data, wavelength):
@@ -85,17 +82,25 @@ def compute_I_D65(data, reflect_data,wavelength):
     I = reflect*illum
     return I
 
-def compute_I_xyz_D65(I, data, wavelength):
+def compute_XYZ_D65(I, data, wavelength):
     x = data['x'][0,:]
     y = data['y'][0,:]
     z = data['z'][0,:]
-    I_xyz = np.zeros((I.shape[0],I.shape[1], 3))
-    I_xyz[:,:,0] = np.dot(I,x)
-    I_xyz[:,:,1] = np.dot(I,y)
-    I_xyz[:,:,2] = np.dot(I,z)
-    return I_xyz
+    XYZ = np.zeros((I.shape[0],I.shape[1], 3))
+    XYZ[:,:,0] = np.dot(I,x)
+    XYZ[:,:,1] = np.dot(I,y)
+    XYZ[:,:,2] = np.dot(I,z)
+    return XYZ
 
+def compute_K(RGB_709, XYZ_WP):
+    K = np.matmul(np.linalg.inv(RGB_709),XYZ_WP)
+    return K
 
+def compute_M(RGB_709, K):
+    diag_K = np.diag(K)
+    print(diag_K)
+    M = np.matmul(RGB_709,diag_K)
+    return M
 # Section 4
 # Load data.npy
 data = np.load('./CIE_data/data.npy', allow_pickle=True)[()]
@@ -105,9 +110,16 @@ reflect_data = np.load('./reflect/reflect.npy', allow_pickle=True)[()]
 wavelength = create_wavelength()
 # Compute I
 I = compute_I_D65(data, reflect_data, wavelength)
-I_xyz = compute_I_xyz_D65(I, data, wavelength)
+XYZ = compute_XYZ_D65(I, data, wavelength)
 
-
+RGB_709 = [[0.640, 0.300, 0.150],
+           [0.330, 0.600, 0.060],
+           [0.030, 0.100, 0.790]]
+D65_WP = [0.3127, 0.3290, 0.3583]
+XYZ_WP = [0.3127/0.3290, 1, 0.3583/0.3290]
+K = compute_K(RGB_709, XYZ_WP)
+M = compute_M(RGB_709, K)
+print(M)
 #wavelength = create_wavelength()
 ##plot_wavelength(data, wavelength)
 
@@ -131,9 +143,7 @@ I_xyz = compute_I_xyz_D65(I, data, wavelength)
 #G_CIE_1931 = [0.27376, 0.71741, 0.00883]
 #B_CIE_1931 = [0.16658, 0.00886, 0.82456]
 
-#R_709 = [0.640, 0.330, 0.030]
-#G_709 = [0.300, 0.600, 0.100]
-#B_709 = [0.150, 0.060, 0.790]
+
 #D65 = [0.3127, 0.3290, 0.3583]
 #EE = [0.3333, 0.3333, 0.3333]
 #plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
