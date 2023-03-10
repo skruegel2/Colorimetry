@@ -82,7 +82,23 @@ def compute_I_D65(data, reflect_data,wavelength):
     I = reflect*illum
     return I
 
+def compute_I_fluor(data, reflect_data,wavelength):
+    illum = data['illum2']
+    reflect = reflect_data['R']
+    I = reflect*illum
+    return I
+
 def compute_XYZ_D65(I, data, wavelength):
+    x = data['x'][0,:]
+    y = data['y'][0,:]
+    z = data['z'][0,:]
+    XYZ = np.zeros((I.shape[0],I.shape[1], 3))
+    XYZ[:,:,0] = np.dot(I,x)
+    XYZ[:,:,1] = np.dot(I,y)
+    XYZ[:,:,2] = np.dot(I,z)
+    return XYZ
+
+def compute_XYZ_fluor(I, data, wavelength):
     x = data['x'][0,:]
     y = data['y'][0,:]
     z = data['z'][0,:]
@@ -158,32 +174,14 @@ RGB_d65 = compute_image_RGB(M,XYZ)
 RGB_d65 = threshold_0_1(RGB_d65)
 RGB_d65 = gamma_correct(RGB_d65,2.2)
 save_image(RGB_d65, 'RGB_D65.tif')
-wavelength = create_wavelength()
-##plot_wavelength(data, wavelength)
-
-#A_inv = np.array([[0.243,0.856,-0.044],
-#                 [-0.3910,1.1650,0.0870],
-#                 [0.01,-0.008,0.5630]])
-
-#cie_1931 = np.zeros((3,31))
-
-#cie_1931[0,:] = data['x'][0,:]
-#cie_1931[1,:] = data['y'][0,:]
-#cie_1931[2,:] = data['z'][0,:]
 
 
-
-#lms = np.matmul(A_inv,cie_1931)
-##plot_lms(lms, wavelength)
-##plot_illumination(data, wavelength)
-## Section 3
-#R_CIE_1931 = [0.73467, 0.26533, 0.0]
-#G_CIE_1931 = [0.27376, 0.71741, 0.00883]
-#B_CIE_1931 = [0.16658, 0.00886, 0.82456]
+I_fluor = compute_I_fluor(data, reflect_data, wavelength)
+XYZ_fluor = compute_XYZ_fluor(I_fluor, data, wavelength)
+RGB_fluor = compute_image_RGB(M, XYZ_fluor)
+RGB_fluor = threshold_0_1(RGB_fluor)
+RGB_fluor = gamma_correct(RGB_fluor,2.2)
+save_image(RGB_d65, 'RGB_fluor.tif')
 
 
-#D65 = [0.3127, 0.3290, 0.3583]
-#EE = [0.3333, 0.3333, 0.3333]
-#plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
-#                  D65, EE)
 
