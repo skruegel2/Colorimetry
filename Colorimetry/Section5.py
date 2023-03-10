@@ -71,7 +71,8 @@ def plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
 x_dim = np.arange(0, 1, 0.005)
 y_dim = np.arange(0, 1, 0.005)
 
-x, y = np.meshgrid(x_dim, y_dim, indexing='ij')
+#x, y = np.meshgrid(x_dim, y_dim, indexing='ij')
+x, y = np.meshgrid(x_dim, y_dim)
 z = 1 - x - y
 
 M = [[0.640, 0.300, 0.150],
