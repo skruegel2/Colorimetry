@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>243a98bc-7871-4b58-9bbd-b1c75bd40bdb</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Section4.py</StartupFile>
+    <StartupFile>Section5.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,6 +24,7 @@
     <Compile Include="HW5.py" />
     <Compile Include="Section2.py" />
     <Compile Include="Section4.py" />
+    <Compile Include="Section5.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
