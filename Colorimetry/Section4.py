@@ -98,9 +98,42 @@ def compute_K(RGB_709, XYZ_WP):
 
 def compute_M(RGB_709, K):
     diag_K = np.diag(K)
-    print(diag_K)
     M = np.matmul(RGB_709,diag_K)
     return M
+
+def compute_image_RGB(M,XYZ):
+    RGB = XYZ
+    for row_idx in range(XYZ.shape[0]):
+        for col_idx in range(XYZ.shape[1]):
+            RGB[row_idx,col_idx,:] = np.matmul(np.linalg.inv(M),XYZ[row_idx,col_idx,:])
+    return RGB
+
+def threshold_0_1(RGB):
+    for row_idx in range(RGB.shape[0]):
+        for col_idx in range(RGB.shape[1]):
+            for color_idx in range(3):
+                if RGB[row_idx,col_idx,color_idx] < 0:
+                    RGB[row_idx,col_idx,color_idx] = 0
+                if RGB[row_idx,col_idx,color_idx] > 1:
+                    RGB[row_idx,col_idx,color_idx] = 1
+    return RGB;
+
+def gamma_correct(RGB, gamma):
+    for row_idx in range(RGB.shape[0]):
+        for col_idx in range(RGB.shape[1]):
+            for color_idx in range(3):
+                RGB[row_idx,col_idx,color_idx] = pow(RGB[row_idx,col_idx,color_idx],1/gamma)
+    return RGB
+
+def save_image(RGB, filename):
+    RGB_int = np.zeros(RGB.shape,np.uint8)
+    for row_idx in range(RGB.shape[0]):
+        for col_idx in range(RGB.shape[1]):
+            for color_idx in range(3):
+                RGB_int[row_idx,col_idx,color_idx] = np.uint8(255*RGB[row_idx,col_idx,color_idx])
+    im = Image.fromarray(RGB_int)
+    im.save(filename)
+
 # Section 4
 # Load data.npy
 data = np.load('./CIE_data/data.npy', allow_pickle=True)[()]
@@ -112,6 +145,7 @@ wavelength = create_wavelength()
 I = compute_I_D65(data, reflect_data, wavelength)
 XYZ = compute_XYZ_D65(I, data, wavelength)
 
+
 RGB_709 = [[0.640, 0.300, 0.150],
            [0.330, 0.600, 0.060],
            [0.030, 0.100, 0.790]]
@@ -119,8 +153,12 @@ D65_WP = [0.3127, 0.3290, 0.3583]
 XYZ_WP = [0.3127/0.3290, 1, 0.3583/0.3290]
 K = compute_K(RGB_709, XYZ_WP)
 M = compute_M(RGB_709, K)
-print(M)
-#wavelength = create_wavelength()
+# Transform XYZ into RGB
+RGB_d65 = compute_image_RGB(M,XYZ)
+RGB_d65 = threshold_0_1(RGB_d65)
+RGB_d65 = gamma_correct(RGB_d65,2.2)
+save_image(RGB_d65, 'RGB_D65.tif')
+wavelength = create_wavelength()
 ##plot_wavelength(data, wavelength)
 
 #A_inv = np.array([[0.243,0.856,-0.044],
