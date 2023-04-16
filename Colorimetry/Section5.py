@@ -5,10 +5,11 @@ from PIL import Image
 
 
 # Section 5
+
 def compute_RGB(RGB, x, y, z, M):
-    for col_idx in range(RGB.shape[0]):
-        for row_idx in range(RGB.shape[1]):
-                RGB[col_idx,row_idx,:] = np.matmul(np.linalg.inv(M),[x[col_idx, row_idx], y[col_idx, row_idx], z[col_idx, row_idx]])
+    for r in range(RGB.shape[0]):
+        for c in range(RGB.shape[1]):
+                RGB[r,c,:] = np.matmul(np.linalg.inv(M),[z[r, c], y[r, c], x[r, c]])
     return RGB
 def remove_negative(RGB):
     for col_idx in range(RGB.shape[0]):
@@ -19,6 +20,7 @@ def remove_negative(RGB):
                     RGB[col_idx, row_idx, 0] = 1
                     RGB[col_idx, row_idx, 1] = 1
                     RGB[col_idx, row_idx, 2] = 1
+
     return RGB
 
 def gamma_correct(RGB, gamma):
@@ -68,6 +70,25 @@ def plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
     plt.plot(x_EE, y_EE, 'mo')
     plt.text(EE[0]+0.025, EE[1],'Equal Energy White')
 
+def compute_single_rgb(XYZ,M):
+    color_ret = np.inner(np.linalg.inv(M),XYZ)
+    return color_ret
+
+def compute_rgb(x,y,z,M):
+    RGB_ret = np.zeros((200,200,3))
+    for r in range(RGB.shape[0]):
+        for c in range(RGB.shape[1]):
+            Color = [x[r,c],y[r,c],z[r,c]]
+            RGB_ret[r,c,:] = compute_single_rgb(Color,M)
+    return RGB_ret
+
+def reorder(RGB):
+    RGB_ret = np.zeros((RGB.shape[0],RGB.shape[1],3))
+    for r in range(RGB.shape[0]):
+        for c in range(RGB.shape[1]):
+            RGB_ret[r,c] = RGB[(RGB.shape[0] -1) -r,c]
+    return RGB_ret
+        
 x_dim = np.arange(0, 1, 0.005)
 y_dim = np.arange(0, 1, 0.005)
 
@@ -79,9 +100,9 @@ M = [[0.640, 0.300, 0.150],
      [0.330, 0.600, 0.060],
      [0.030, 0.100, 0.790]]
 RGB = np.zeros((200, 200, 3))
-RGB = compute_RGB(RGB, x, y, z, M)
-RGB = remove_negative(RGB)
-RGB = gamma_correct(RGB,2.2)
+#RGB = compute_RGB(RGB, x, y, z, M)
+#RGB = remove_negative(RGB)
+#RGB = gamma_correct(RGB,2.2)
 R_CIE_1931 = [0.73467, 0.26533, 0.0]
 G_CIE_1931 = [0.27376, 0.71741, 0.00883]
 B_CIE_1931 = [0.16658, 0.00886, 0.82456]
@@ -93,7 +114,11 @@ D65 = [0.3127, 0.3290, 0.3583]
 EE = [0.3333, 0.3333, 0.3333]
 data = np.load('.\CIE_data\data.npy', allow_pickle=True)[()]
 
-plt.imshow(RGB,extent=[0,1,1,0])
+RGB = compute_rgb(x,y,z,M)
+RGB = remove_negative(RGB)
+RGB = reorder(RGB)
+RGB = gamma_correct(RGB,2.2)
+plt.imshow(RGB,extent=[0,1,0,1])
 plot_chromaticity(data,R_CIE_1931,G_CIE_1931,B_CIE_1931,R_709,G_709,B_709,
                   D65, EE)
 plt.show()
